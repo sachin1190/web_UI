@@ -25,7 +25,32 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
+  Animation yellowBall;
+  AnimationController yellowBallController;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    yellowBallController =
+        AnimationController(vsync: this, duration: Duration(seconds: 5));
+
+    yellowBall =
+        Tween<double>(begin: 120, end: 300).animate(yellowBallController);
+
+    yellowBallController.forward();
+
+    yellowBall.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        yellowBallController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        yellowBallController.forward();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -158,24 +183,28 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
           ),
-          Positioned(
-            top: 120,
-            left: MediaQuery.of(context).size.width / 1.7,
-            child: Container(
-              width: 115,
-              height: 115,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.yellow,
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black45,
-                      offset: Offset(-1, 10),
-                      blurRadius: 10.0),
-                ],
-              ),
-            ),
-          ),
+          AnimatedBuilder(
+              animation: yellowBall,
+              builder: (context, child) {
+                return Positioned(
+                  top: yellowBall.value,
+                  left: MediaQuery.of(context).size.width / 1.7,
+                  child: Container(
+                    width: 115,
+                    height: 115,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.yellow,
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black45,
+                            offset: Offset(-1, 10),
+                            blurRadius: 10.0),
+                      ],
+                    ),
+                  ),
+                );
+              }),
           Positioned(
             top: 330,
             left: MediaQuery.of(context).size.width / 1.7,
